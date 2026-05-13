@@ -587,8 +587,6 @@ scales: [960, 1024, 1280]
 ## 📧 联系方式
 
 - **作者**：DOULA
-- **学校**：OUC
-- **专业**：[您的专业]
 - **邮箱**：renxiongyin@gmail.com
 - **GitHub**：https://github.com/xiongyinr
 
