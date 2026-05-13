@@ -1,0 +1,16 @@
+train: "D:/毕业论文/YOLO-HSPN/dataset/train/images"
+val: "D:/毕业论文/YOLO-HSPN/dataset/val/images"
+
+# 10个类别
+nc: 10
+names:
+  0: cube
+  1: ball
+  2: cylinder
+  3: human body
+  4: plane
+  5: circle cage
+  6: square cage
+  7: metal bucket
+  8: tyre
+  9: rov

@@ -1,0 +1,83 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# PyTorch
+*.pth
+*.pt
+*.onnx
+*.engine
+*.trt
+*.torchscript
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+runs/
+wandb/
+*.weights
+
+# Large files - keep structure but ignore large model files
+# Model weights are too large for GitHub
+*.pt
+!yolov13n.pt
+!yolov13s.pt
+
+# Dataset - too large for GitHub, provide download link in README
+dataset/train/images/
+dataset/val/images/
+dataset/test/images/
+
+# Keep label files but not images
+!dataset/train/labels/
+!dataset/val/labels/
+!dataset/test/labels/
+
+# Results - keep structure but exclude large files
+result/*/weights/
+result/*/runs/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.bak
+*.cache

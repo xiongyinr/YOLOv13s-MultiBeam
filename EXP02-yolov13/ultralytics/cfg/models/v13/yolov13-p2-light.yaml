@@ -1,0 +1,71 @@
+# 修改内容：
+# P2 通道数减半: 128 → 64（第26行）
+# 减少重复次数: 所有 head 中的 DSC3k2 从 2 次降至 1 次
+# 深度可分离卷积: 所有下采样用 DSConv 替代 Conv（第27/31/35行）
+# 保持兼容性: backbone 和 HyperACE 模块完全不变
+
+nc: 10 # number of classes (modified for your 10-class dataset)
+scales:
+  n: [0.50, 0.25, 1024]
+  s: [0.50, 0.50, 1024]
+  l: [1.00, 1.00, 512]
+  x: [1.00, 1.50, 512]
+
+backbone:
+  # [from, repeats, module, args]
+  - [-1, 1, Conv,    [64, 3, 2]]           # 0-P1/2
+  - [-1, 1, Conv,    [128, 3, 2, 1, 2]]    # 1-P2/4
+  - [-1, 2, DSC3k2,  [256, False, 0.25]]   # 2
+  - [-1, 1, Conv,    [256, 3, 2, 1, 4]]    # 3-P3/8
+  - [-1, 2, DSC3k2,  [512, False, 0.25]]   # 4
+  - [-1, 1, DSConv,  [512, 3, 2]]          # 5-P4/16
+  - [-1, 4, A2C2f,   [512, True, 4]]       # 6
+  - [-1, 1, DSConv,  [1024, 3, 2]]         # 7-P5/32
+  - [-1, 4, A2C2f,   [1024, True, 1]]      # 8
+
+head:
+  # HyperACE cross-scale attention (P3, P4, P5)
+  - [[4, 6, 8], 2, HyperACE, [512, 8, True, True, 0.5, 1, "both"]]    # 9
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]                        # 10
+  - [9, 1, DownsampleConv, []]                                        # 11
+  - [[6, 9],  1, FullPAD_Tunnel, []]   # 12
+  - [[4, 10], 1, FullPAD_Tunnel, []]   # 13
+  - [[8, 11], 1, FullPAD_Tunnel, []]   # 14
+
+  # P4 fusion
+  - [-1, 1, nn.Upsample, [None, 2, "nearest"]]   # 15
+  - [[-1, 12], 1, Concat, [1]]                    # 16 cat P4
+  - [-1, 2, DSC3k2, [512, True]]                  # 17
+  - [[-1, 9], 1, FullPAD_Tunnel, []]              # 18
+
+  # P3 fusion
+  - [17, 1, nn.Upsample, [None, 2, "nearest"]]    # 19
+  - [[-1, 13], 1, Concat, [1]]                    # 20 cat P3
+  - [-1, 2, DSC3k2, [256, True]]                  # 21
+  - [10, 1, Conv, [256, 1, 1]]                    # 22
+  - [[21, 22], 1, FullPAD_Tunnel, []]             # 23
+
+  # P2 fusion (lightweight — optimized for small objects)
+  - [21, 1, nn.Upsample, [None, 2, "nearest"]]    # 24 upsample P3→P2
+  - [[-1, 2], 1, Concat, [1]]                     # 25 cat backbone P2
+  - [-1, 1, DSC3k2, [64, True]]                   # 26 (P2/4-xsmall) — reduced channels: 128→64, repeats: 2→1
+
+  # P3 output (downsample from P2)
+  - [-1, 1, DSConv, [256, 3, 2]]                  # 27 — use DSConv instead of Conv
+  - [[-1, 23], 1, Concat, [1]]                    # 28 cat head P3
+  - [-1, 1, DSC3k2, [256, True]]                  # 29 (P3) — reduced repeats: 2→1
+  - [[-1, 22], 1, FullPAD_Tunnel, []]             # 30
+
+  # P4 output
+  - [29, 1, DSConv, [512, 3, 2]]                  # 31 — use DSConv instead of Conv
+  - [[-1, 18], 1, Concat, [1]]                    # 32 cat head P4
+  - [-1, 1, DSC3k2, [512, True]]                  # 33 (P4) — reduced repeats: 2→1
+  - [[-1, 12], 1, FullPAD_Tunnel, []]             # 34
+
+  # P5 output
+  - [33, 1, DSConv, [512, 3, 2]]                  # 35 — use DSConv instead of Conv
+  - [[-1, 14], 1, Concat, [1]]                    # 36 cat head P5
+  - [-1, 1, DSC3k2, [1024, True]]                 # 37 (P5) — reduced repeats: 2→1
+  - [[-1, 11], 1, FullPAD_Tunnel, []]             # 38
+
+  - [[26, 30, 34, 38], 1, Detect, [nc]]           # Detect(P2, P3, P4, P5)

@@ -1,0 +1,8 @@
+PyQt5>=5.15.0
+ultralytics
+torch
+torchvision
+opencv-python
+matplotlib
+Pillow
+PyYAML

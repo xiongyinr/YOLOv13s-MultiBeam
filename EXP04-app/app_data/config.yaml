@@ -1,0 +1,25 @@
+app:
+  language: zh_CN
+  name: YOLO训练助手
+  version: 1.0.0
+inference:
+  default_conf: 0.25
+  default_iou: 0.7
+  default_max_det: 300
+  save_results: true
+paths:
+  datasets_dir: d:\毕业论文\YOLO-HSPN\EXP04-app\app_data\datasets
+  logs_dir: d:\毕业论文\YOLO-HSPN\EXP04-app\app_data\logs
+  models_dir: d:\毕业论文\YOLO-HSPN\EXP04-app\app_data\models
+  temp_dir: d:\毕业论文\YOLO-HSPN\EXP04-app\app_data\temp
+training:
+  default_batch: 16
+  default_device: auto
+  default_epochs: 100
+  default_imgsz: 640
+  default_optimizer: auto
+  save_period: 10
+ui:
+  theme: light
+  window_height: 800
+  window_width: 1200
