@@ -26,11 +26,11 @@ ENV/
 env/
 .venv
 
-# PyTorch
-*.pth
-*.pt
-*.onnx
-*.engine
+# PyTorch (now managed by Git LFS)
+# *.pth
+# *.pt
+# *.onnx
+# *.engine
 *.trt
 *.torchscript
 
@@ -53,11 +53,8 @@ runs/
 wandb/
 *.weights
 
-# Large files - keep structure but ignore large model files
-# Model weights are too large for GitHub
-*.pt
-!yolov13n.pt
-!yolov13s.pt
+# Large files - now managed by Git LFS
+# Model weights are managed by Git LFS
 
 # Dataset - too large for GitHub, provide download link in README
 dataset/train/images/
@@ -69,8 +66,8 @@ dataset/test/images/
 !dataset/val/labels/
 !dataset/test/labels/
 
-# Results - keep structure but exclude large files
-result/*/weights/
+# Results - keep weights (managed by LFS), exclude runs
+# result/*/weights/
 result/*/runs/
 
 # Logs
